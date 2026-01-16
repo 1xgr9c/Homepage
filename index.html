@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimalist Start</title>
+  <meta name="description" content="A clean, minimalist browser start page for news and radio.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #fafafa;
+      color: #1a1a1a;
+      margin: 0;
+      padding: 0;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-start min-h-screen p-4">
+
+  <!-- Search Bar -->
+  <div class="w-full max-w-md mb-6">
+    <input 
+      type="text" 
+      placeholder="Search Google..." 
+      class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      onkeydown="if(event.key==='Enter'){window.location='https://www.google.com/search?q='+this.value}">
+  </div>
+
+  <!-- Links Grid -->
+  <div class="grid grid-cols-3 gap-4 w-full max-w-md text-center">
+    
+    <a href="https://www.theguardian.com" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/guardian.png" alt="Guardian" class="w-12 h-12 mb-2">
+      Guardian
+    </a>
+    
+    <a href="https://www.at5.nl" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/at5.png" alt="AT5" class="w-12 h-12 mb-2">
+      AT5
+    </a>
+    
+    <a href="https://www.nos.nl" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/nos.png" alt="NOS" class="w-12 h-12 mb-2">
+      NOS
+    </a>
+    
+    <a href="https://www.residentadvisor.net" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/ra.png" alt="Resident Advisor" class="w-12 h-12 mb-2">
+      Resident Advisor
+    </a>
+    
+    <a href="https://claude.ai" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/claude.png" alt="Claude AI" class="w-12 h-12 mb-2">
+      Claude AI
+    </a>
+    
+    <a href="https://www.akhigym.nl/blank-2" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/akhi.png" alt="Akhi Gym" class="w-12 h-12 mb-2">
+      Akhi Gym
+    </a>
+    
+    <a href="https://www.nts.live" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/nts.png" alt="NTS" class="w-12 h-12 mb-2">
+      NTS
+    </a>
+    
+    <a href="https://www.funx.nl" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/funx.png" alt="FunX" class="w-12 h-12 mb-2">
+      FunX
+    </a>
+    
+    <a href="https://reprezent.org.uk" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/reprezent.png" alt="Reprezent" class="w-12 h-12 mb-2">
+      Reprezent
+    </a>
+    
+    <a href="https://rinse.fm" target="_blank" class="p-3 bg-gray-100 rounded hover:bg-gray-200 flex flex-col items-center">
+      <img src="images/rinse.png" alt="Rinse FM" class="w-12 h-12 mb-2">
+      Rinse FM
+    </a>
+
+  </div>
+
+</body>
+</html>
