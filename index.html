@@ -72,7 +72,7 @@
             { id: 'r6', name: 'BBC Radio 6', url: 'https://www.bbc.co.uk/6music', domain: 'bbc.co.uk' },
         ];
 
-        const GridItem = ({ item, isRadio, onRemove, onEdit, isPlaying, onTogglePlay }) => {
+        const GridItem = ({ item, isEditable, onRemove, onEdit, isPlaying, onTogglePlay }) => {
             const favicon = `https://www.google.com/s2/favicons?domain=${item.domain}&sz=128`;
             
             return (
@@ -105,7 +105,7 @@
                         </div>
                         <a href={item.url} target="_blank" className="text-[8px] md:text-[10px] font-semibold text-gray-700 uppercase tracking-[0.1em] text-center truncate w-full px-0.5">{item.name}</a>
                     </div>
-                    {isRadio && (
+                    {isEditable && (
                         <div className="absolute -top-1 -right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 scale-[0.6] md:scale-[0.7]">
                             <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }} className="bg-white border border-gray-200 p-2 rounded-full text-gray-400 hover:text-red-500 shadow-sm">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="2.5" strokeLinecap="round"/></svg>
@@ -119,7 +119,7 @@
             );
         };
 
-        const StationModal = ({ isOpen, onClose, onConfirm, item }) => {
+        const StationModal = ({ isOpen, onClose, onConfirm, item, type }) => {
             const [data, setData] = useState({ name: '', url: '', streamUrl: '', tracklistUrl: '' });
             useEffect(() => {
                 if (item) setData(item);
@@ -131,7 +131,9 @@
             return (
                 <div className="fixed inset-0 bg-white/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
                     <div className="bg-white border border-gray-100 shadow-2xl rounded-[1.5rem] w-full max-w-sm p-8 animate-fade">
-                        <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 text-gray-400">Configure Station</h2>
+                        <h2 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 text-gray-400">
+                            {type === 'radio' ? (item ? 'Edit Station' : 'Add Station') : (item ? 'Edit Link' : 'Add Link')}
+                        </h2>
                         <div className="space-y-4">
                             {['name', 'url', 'streamUrl', 'tracklistUrl'].map(key => (
                                 <div key={key}>
@@ -160,23 +162,31 @@
         const App = () => {
             const [time, setTime] = useState(new Date());
             const [radio, setRadio] = useState([]);
-            const [modal, setModal] = useState({ open: false, item: null });
+            const [links, setLinks] = useState([]);
+            const [modal, setModal] = useState({ open: false, item: null, type: 'radio' });
             const [playing, setPlaying] = useState(null);
             const audio = useRef(null);
 
-            const combinedLinks = [...NEWS_LINKS, ...TOOL_LINKS];
-
             useEffect(() => {
                 audio.current = new Audio();
-                const saved = localStorage.getItem('homepage_minimal_v16');
-                setRadio(saved ? JSON.parse(saved) : DEFAULT_RADIO);
+                const savedRadio = localStorage.getItem('homepage_minimal_v16');
+                setRadio(savedRadio ? JSON.parse(savedRadio) : DEFAULT_RADIO);
+                
+                const savedLinks = localStorage.getItem('homepage_links_v16');
+                setLinks(savedLinks ? JSON.parse(savedLinks) : [...NEWS_LINKS, ...TOOL_LINKS]);
+
                 const t = setInterval(() => setTime(new Date()), 1000);
                 return () => clearInterval(t);
             }, []);
 
-            const save = (list) => {
+            const saveRadio = (list) => {
                 setRadio(list);
                 localStorage.setItem('homepage_minimal_v16', JSON.stringify(list));
+            };
+
+            const saveLinks = (list) => {
+                setLinks(list);
+                localStorage.setItem('homepage_links_v16', JSON.stringify(list));
             };
 
             const togglePlay = (item) => {
@@ -203,11 +213,28 @@
                         </p>
                     </header>
 
-                    <main className="w-full flex-grow flex flex-col justify-between py-6 md:py-10 max-w-4xl mx-auto overflow-hidden">
+                    <main className="w-full flex-grow flex flex-col justify-center gap-y-10 md:gap-y-16 py-6 md:py-10 max-w-4xl mx-auto overflow-hidden">
                         <section className="shrink-0 flex flex-col items-center">
                             <h2 className="text-[7px] md:text-[8px] uppercase tracking-[0.4em] text-gray-400 font-bold mb-4 md:mb-6 text-center">News and Tools</h2>
                             <div className="flex flex-wrap justify-center gap-x-6 gap-y-4 md:gap-x-12 md:gap-y-8">
-                                {combinedLinks.map(l => <GridItem key={l.id} item={l} />)}
+                                {links.map(l => (
+                                    <GridItem 
+                                        key={l.id} 
+                                        item={l} 
+                                        isEditable
+                                        onRemove={id => saveLinks(links.filter(x => x.id !== id))}
+                                        onEdit={item => setModal({ open: true, item, type: 'link' })}
+                                    />
+                                ))}
+                                <div className="flex flex-col items-center max-w-[85px] md:max-w-[100px]">
+                                    <button 
+                                        onClick={() => setModal({ open: true, item: null, type: 'link' })} 
+                                        className="w-16 h-16 md:w-20 md:h-20 border border-dashed border-gray-200 rounded-xl md:rounded-2xl flex items-center justify-center hover:border-gray-400 transition-all group shrink-0"
+                                    >
+                                        <span className="text-gray-200 group-hover:text-gray-400 text-3xl font-light">+</span>
+                                    </button>
+                                    <span className="text-[8px] md:text-[10px] font-semibold text-gray-300 uppercase tracking-[0.1em] mt-1.5">Add</span>
+                                </div>
                             </div>
                         </section>
 
@@ -218,16 +245,16 @@
                                     <GridItem 
                                         key={r.id} 
                                         item={r} 
-                                        isRadio 
+                                        isEditable 
                                         isPlaying={playing === r.id}
                                         onTogglePlay={togglePlay}
-                                        onRemove={id => save(radio.filter(x => x.id !== id))}
-                                        onEdit={item => setModal({ open: true, item })}
+                                        onRemove={id => saveRadio(radio.filter(x => x.id !== id))}
+                                        onEdit={item => setModal({ open: true, item, type: 'radio' })}
                                     />
                                 ))}
                                 <div className="flex flex-col items-center max-w-[85px] md:max-w-[100px]">
                                     <button 
-                                        onClick={() => setModal({ open: true, item: null })} 
+                                        onClick={() => setModal({ open: true, item: null, type: 'radio' })} 
                                         className="w-16 h-16 md:w-20 md:h-20 border border-dashed border-gray-200 rounded-xl md:rounded-2xl flex items-center justify-center hover:border-gray-400 transition-all group shrink-0"
                                     >
                                         <span className="text-gray-200 group-hover:text-gray-400 text-3xl font-light">+</span>
@@ -237,14 +264,20 @@
                             </div>
                         </section>
                     </main>
-                    
+
                     <StationModal 
                         isOpen={modal.open} 
                         item={modal.item} 
-                        onClose={() => setModal({ open: false, item: null })} 
+                        type={modal.type}
+                        onClose={() => setModal({ open: false, item: null, type: modal.type })} 
                         onConfirm={item => {
-                            if (modal.item) save(radio.map(r => r.id === item.id ? item : r));
-                            else save([...radio, item]);
+                            if (modal.type === 'radio') {
+                                if (modal.item) saveRadio(radio.map(r => r.id === item.id ? item : r));
+                                else saveRadio([...radio, item]);
+                            } else {
+                                if (modal.item) saveLinks(links.map(l => l.id === item.id ? item : l));
+                                else saveLinks([...links, item]);
+                            }
                         }}
                     />
                 </div>
