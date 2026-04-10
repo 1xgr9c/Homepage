@@ -59,7 +59,9 @@
 
         const TOOL_LINKS = [
             { id: 't1', name: 'Claude AI', url: 'https://claude.ai', domain: 'claude.ai' },
-            { id: 't2', name: 'Akhi Gym', url: 'https://www.akhigym.nl/blank-2', domain: 'akhigym.nl' },
+            { id: 'offbeat', name: 'Offbeat', url: 'https://offbeat.amsterdam/', domain: 'offbeat.amsterdam' },
+            { id: 'pontveer', name: 'Pontveer', url: 'https://pontveer.nl/stops/NDSM%20(F4,%20F7)/Centraal%20Station%20(F4)', domain: 'pontveer.nl' },
+            { id: 'radar-squat', name: 'Radar.Squat', url: 'https://radar.squat.net/en/events/city/Amsterdam?language=eu', domain: 'radar.squat.net' },
         ];
 
         const DEFAULT_RADIO = [
@@ -68,8 +70,8 @@
             { id: 'r2', name: 'FunX', url: 'https://www.funx.nl', tracklistUrl: 'https://www.funx.nl/radio/playlist', streamUrl: 'https://icecast.omroep.nl/funx-bb-mp3', domain: 'funx.nl' },
             { id: 'r3', name: 'Reprezent', url: 'https://www.reprezent.org.uk', domain: 'reprezent.org.uk' },
             { id: 'r4', name: 'Rinse FM', url: 'https://rinse.fm', domain: 'rinse.fm' },
-            { id: 'r5', name: 'Subtle FM', url: 'https://www.subtlefm.com', domain: 'subtlefm.com' },
-            { id: 'r6', name: 'BBC Radio 6', url: 'https://www.bbc.co.uk/6music', domain: 'bbc.co.uk' },
+            { id: 'soulection', name: 'Soulection', url: 'https://soundcloud.com/soulection', domain: 'soundcloud.com' },
+            { id: 'radio-garden', name: 'Radio Garden', url: 'https://radio.garden/', domain: 'radio.garden' },
         ];
 
         const GridItem = ({ item, isEditable, onRemove, onEdit, isPlaying, onTogglePlay }) => {
@@ -169,11 +171,27 @@
 
             useEffect(() => {
                 audio.current = new Audio();
+                
                 const savedRadio = localStorage.getItem('homepage_minimal_v16');
-                setRadio(savedRadio ? JSON.parse(savedRadio) : DEFAULT_RADIO);
+                let finalRadio = DEFAULT_RADIO;
+                if (savedRadio) {
+                    const currentRadio = JSON.parse(savedRadio);
+                    const missingRadio = DEFAULT_RADIO.filter(d => !currentRadio.find(c => c.id === d.id));
+                    finalRadio = [...currentRadio, ...missingRadio];
+                }
+                setRadio(finalRadio);
+                localStorage.setItem('homepage_minimal_v16', JSON.stringify(finalRadio));
                 
                 const savedLinks = localStorage.getItem('homepage_links_v16');
-                setLinks(savedLinks ? JSON.parse(savedLinks) : [...NEWS_LINKS, ...TOOL_LINKS]);
+                const defaultLinks = [...NEWS_LINKS, ...TOOL_LINKS];
+                let finalLinks = defaultLinks;
+                if (savedLinks) {
+                    const currentLinks = JSON.parse(savedLinks).filter(l => l.id !== 't2' && l.id !== '6');
+                    const missingLinks = defaultLinks.filter(d => !currentLinks.find(c => c.id === d.id));
+                    finalLinks = [...currentLinks, ...missingLinks];
+                }
+                setLinks(finalLinks);
+                localStorage.setItem('homepage_links_v16', JSON.stringify(finalLinks));
 
                 const t = setInterval(() => setTime(new Date()), 1000);
                 return () => clearInterval(t);
